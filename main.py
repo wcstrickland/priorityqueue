@@ -1,74 +1,80 @@
+import random
+
+
 class Employee:
+    emp_number = 0
     all_emps = []
     today_emps = []
     off_emps = []
 
-    def __init__(self, f_name, l_name, max_hours=8):
-        self.f_name = f_name
-        self.l_name = l_name
+    def __init__(self, fname, lname, max_hours=8, today_hours=0):
+        self.number = self.emp_number
+        self.fname = fname
+        self.lname = lname
         self.max_hours = max_hours
-        self.today_hours = 0
+        self.today_hours = today_hours
         self.today_jobs = []
-        Employee.all_emps.append(self)
+        self.booked = False
+        self.all_emps.append(self)
+        Employee.emp_number += 1
 
-
-class JobsUrgency:
-    urgencies = {}
+    def __repr__(self):
+        return f"{self.number}: {self.fname}{self.lname} scheduled:{self.today_hours}, max:{self.max_hours}"
 
 
 class Job:
+    jobs_number = 0
 
-    def __init__(self, number, urgency, estimated_hours, hours_existed, unit, _priority_levels, _urgency_levels):
-        if urgency in priority_levels.priority_queues_names:
-            self.number = number
-            self.urgency = urgency
-            self.estimated_hours = estimated_hours
-            self.hours_existed = hours_existed
-            self.unit = unit
-            _priority_levels.priority_queues[_urgency_levels.urgencies[urgency]].insert(self)
-        else:
-            print("Error: Invalid urgency level")
+    def __init__(self, unit, time, priority):
+        self.unit = unit
+        self.time = time
+        self.priority = priority
+        self.job_number = self.jobs_number
+        for heap in MaxHeap.heaps_list:
+            if priority == heap.priority_level:
+                heap.insert(self)
+        Job.jobs_number += 1
 
-
-class PriorityLevels:
-    priority_queues_names = []
-    priority_queues = []
+    def __repr__(self):
+        return f"job#:{self.job_number}, unit:{self.unit}, time:{self.time}, plevel:{self.priority}"
 
 
-class PriorityLevel:
+class MaxHeap:
+    heaps_list = []
 
-    def __init__(self, name, _priority_levels, _urgency_levels):
+    def __init__(self, priority_level):
+        for heap in self.heaps_list:
+            if priority_level == heap.priority_level:
+                print("Error: Priority Level already exists")
+                return
         self.heap = []
-        self.name = name
-        _priority_levels.priority_queues_names.append(self.name)
-        _priority_levels.priority_queues_names.sort()
-        _priority_levels.priority_queues.append(self)
-        _urgency_levels.urgencies[name] = len(_priority_levels.priority_queues_names) - 1
+        self.priority_level = priority_level
+        self.heaps_list.append(self)
 
-    # def build_heap(self, array):
-    #     f_parent = (len(array) - 2) // 2
-    #     for cur_idx in reversed(range(f_parent + 1)):
-    #         self.sift_down(cur_idx, len(array) - 1, array)
-    #     return array
+    def __str__(self):
+        return f"plevel: {self.priority_level}"
 
-    def sift_down(self, cur_idx, end_idx, heap):
+    def __repr__(self):
+        return f"heap 0bj plevel: {self.priority_level}"
+
+    def siftDown(self, cur_idx, end_idx, heap):
         fchild_idx = cur_idx * 2 + 1
         while fchild_idx <= end_idx:
             schild_idx = cur_idx * 2 + 2 if cur_idx * 2 + 2 <= end_idx else -1
-            if schild_idx != -1 and heap[schild_idx] < heap[fchild_idx]:
+            if schild_idx != -1 and heap[schild_idx].time > heap[fchild_idx].time:
                 swap_idx = schild_idx
             else:
                 swap_idx = fchild_idx
-            if heap[swap_idx] < heap[cur_idx]:
+            if heap[swap_idx].time > heap[cur_idx].time:
                 self.swap(cur_idx, swap_idx, heap)
                 cur_idx = swap_idx
                 fchild_idx = cur_idx * 2 + 1
             else:
                 return
 
-    def sift_up(self, cur_idx, heap):
+    def siftUp(self, cur_idx, heap):
         parent_idx = (cur_idx - 1) // 2
-        while cur_idx > 0 and heap[cur_idx] < heap[parent_idx]:
+        while cur_idx > 0 and heap[cur_idx].time > heap[parent_idx].time:
             self.swap(cur_idx, parent_idx, heap)
             cur_idx = parent_idx
             parent_idx = (cur_idx - 1) // 2
@@ -76,33 +82,60 @@ class PriorityLevel:
     def peek(self):
         return self.heap[0]
 
-    def pop_max(self):
+    def remove(self):
         self.swap(0, len(self.heap) - 1, self.heap)
         remove_val = self.heap.pop()
-        self.sift_down(0, len(self.heap) - 1, self.heap)
+        self.siftDown(0, len(self.heap) - 1, self.heap)
         return remove_val
 
     def insert(self, job):
-        idx = job.hours_existed
-        
-        self.heap.append()
-        self.sift_up(len(self.heap) - 1, self.heap)
+        self.heap.append(job)
+        self.siftUp(len(self.heap) - 1, self.heap)
 
     def swap(self, i, j, heap):
         heap[i], heap[j] = heap[j], heap[i]
 
 
-urgency_levels = JobsUrgency
-priority_levels = PriorityLevels
+def schedule(off_employees: list):
+    """
+    loop through employees and assign most prioritized job until all queues are empty or employees are empty. remove employee when scheduled time exceeds 7
+    """
+    # update "today_employees" by removing emps specified to be off
 
-a = PriorityLevel("a", priority_levels, urgency_levels)
-b = PriorityLevel("b", priority_levels, urgency_levels)
-c = PriorityLevel("c", priority_levels, urgency_levels)
-d = PriorityLevel("d", priority_levels, urgency_levels)
+    for emp in off_employees:
+        Employee.off_emps.append(emp)
 
-print(priority_levels.priority_queues_names)
-print(priority_levels.priority_queues)
+    for emp in Employee.all_emps:
+        if emp not in Employee.off_emps:
+            Employee.today_emps.append(emp)
 
-a123 = Job("123", "a", 3, "c1", priority_levels, urgency_levels)
+    all_booked = False
+    for heap in MaxHeap.heaps_list:
+        counter = 0
+        while len(heap) and not all_booked:
 
-print(a.peek())
+            next_job = heap.remove()
+            all_booked = True
+
+            for emp in Employee.today_emps:
+                if emp.booked:
+                    continue
+
+                if emp.today_hours > 7:
+                    emp.booked = True
+                    continue
+
+                for emp in Employee.today_emps:
+                    if not emp.booked:
+                        all_booked = False
+
+                if next_job.time + emp.today_hours < 8:
+                    emp.today_hours += next_job.time
+                    emp.today_jobs.append(next_job)
+                    break
+
+                if next_job + emp.today_hours > 8:
+                    counter += 1
+
+                if counter == 1000:
+                    break
