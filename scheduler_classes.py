@@ -1,5 +1,4 @@
-# TODO create a sorting function that will sort the priority queues in "heaps_list"
-# Todo test: normal behavior of que, test schedule is generated and never infinite loops
+# Todo test:  test schedule is generated and never infinite loops
 
 
 class Employee:
@@ -59,6 +58,7 @@ class MaxHeap:
         self.no_match_jobs = []
         self.priority_level = priority_level
         self.heaps_list.append(self)
+        quick_sort(self.heaps_list)
 
     def __str__(self):
         return f"plevel: {self.priority_level}"
@@ -109,6 +109,46 @@ class MaxHeap:
 
     def swap(self, i, j, heap):
         heap[i], heap[j] = heap[j], heap[i]
+
+
+def quick_sort(array):
+    """
+    quick sort modified to sort an array of heaps based on p_level property
+    :param array:
+    :return:
+    """
+    qs_helper(array, 0, len(array) - 1)
+    return array
+
+
+def qs_helper(array, s_idx, e_idx):
+    """
+    quick sort recursive function
+    :param array:
+    :param s_idx:
+    :param e_idx:
+    :return:
+    """
+    if s_idx >= e_idx:
+        return
+    p_idx = s_idx
+    l = s_idx + 1
+    r = e_idx
+    while r >= l:
+        if array[l].priority_level > array[p_idx].priority_level > array[r].priority_level:
+            array[l], array[r] = array[r], array[l]
+        if array[l].priority_level <= array[p_idx].priority_level:
+            l += 1
+        if array[r].priority_level >= array[p_idx].priority_level:
+            r -= 1
+    array[p_idx], array[r] = array[r], array[p_idx]
+    left_smaller = r - 1 - s_idx < e_idx - (r + 1)
+    if left_smaller:
+        qs_helper(array, s_idx, r - 1)
+        qs_helper(array, r + 1, e_idx)
+    else:
+        qs_helper(array, r + 1, e_idx)
+        qs_helper(array, s_idx, r - 1)
 
 
 def remove_emp_no(employee_number):
