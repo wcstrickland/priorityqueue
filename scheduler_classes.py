@@ -43,7 +43,7 @@ class Job:
         Job.jobs_number += 1
 
     def __repr__(self):
-        return f"job#:{self.job_number}, unit:{self.unit}, time_existed:{self.time_existed},\\" \
+        return f"JOB#:{self.job_number}, unit:{self.unit}, time_existed:{self.time_existed},\\" \
                f" time_needed: {self.time_needed}, plevel:{self.priority}"
 
 
@@ -151,15 +151,20 @@ def qs_helper(array, s_idx, e_idx):
         qs_helper(array, s_idx, r - 1)
 
 
+def get_emp_no(employee_number):
+    for emp in Employee.all_emps:
+        if emp.number == employee_number:
+            return emp
+
+
 def remove_emp_no(employee_number):
     """
     removes an employee using emp.number
     :param employee_number: number matched against emp.number
     :return:
     """
-    for emp in Employee.all_emps:
-        if emp.number == employee_number:
-            Employee.all_emps.remove(emp)
+    emp_to_remove = get_emp_no(employee_number)
+    Employee.all_emps.remove(emp_to_remove)
 
 
 def remove_job_no(job_id_number):
@@ -175,46 +180,119 @@ def remove_job_no(job_id_number):
                 heap.heap = heap.build_heap(heap.heap)
 
 
+def emp_gen(lst, n=0):
+    """
+    a generator allowing one to loop through a list and remember where to start next time
+    :param lst:
+    :param n:
+    :return:
+    """
+    yield n % len(lst)
+    yield from emp_gen(lst, n + 1)
+
+
+def reset_day():
+    """
+    resets scheduling defaults
+    :return:
+    """
+    Employee.today_emps = []
+    Employee.off_emps = []
+    for emp in Employee.all_emps:
+        emp.today_hours = 0
+        emp.today_jobs = []
+        emp.booked = False
+    for heap in MaxHeap.heaps_list:
+        heap.no_match_jobs = []
+
+
 # todo test this steaming pile of bugs waiting to happen
 def schedule(off_employees: list):
     """
-    loop through employees and assign most prioritized job until all queues are empty or employees are empty. remove
-    employee when scheduled time exceeds 7
+    assign emps high priority jobs evenly until schedules are full or no jobs remain
     """
+    # reset the day
+    reset_day()
     # update "today_employees" by removing emps specified to be off
-
     for emp in off_employees:
         Employee.off_emps.append(emp)
-
     for emp in Employee.all_emps:
         if emp not in Employee.off_emps:
             Employee.today_emps.append(emp)
 
+    # create a generator to "remember" the last employee checked
+    gen = emp_gen(Employee.today_emps)
+
+    # init a variable determining if all employees are booked
     all_booked = False
+
+    # traverse each queue in heaps_list
     for heap in MaxHeap.heaps_list:
-        while len(heap) and not all_booked:
 
-            next_job = heap.pop_max()
+        # while the heap has jobs and not all emps are "booked"
+        while heap.heap and not all_booked:
+
+            # pop a new job and temporarily set all_booked to true
+            if heap.heap:
+                next_job = heap.pop_max()
+            else:
+                break
+
+            # set all booked to true this is later turned off if any employee isn't booked
             all_booked = True
+            # set the current job to being incompatible with an employees schedule
+            job_no_match = True
 
-            for emp in Employee.today_emps:
+            # iterate through the number of emps in today's list
+            # ensures every emp is checked for a given job
+            for i in range(len(Employee.today_emps)):
+                # the employee is remembered via generator
+                emp = Employee.today_emps[next(gen)]
+                job_no_match = True
+
+                # if the emp is booked move to next emp
                 if emp.booked:
                     continue
 
-                if emp.today_hours > 7:
+                # if the emp reaches max hours mark as booked
+                if emp.today_hours == emp.max_hours:
                     emp.booked = True
                     continue
 
-                for emp in Employee.today_emps:
-                    if not emp.booked:
-                        all_booked = False
-
-                if next_job.time_needed + emp.today_hours < 8:
+                # if the job doesnt put them over 8hrs
+                if next_job.time_needed + emp.today_hours <= 8:
+                    # update hours and add the job
                     emp.today_hours += next_job.time_needed
                     emp.today_jobs.append(next_job)
-                    break
+                    # job picked. is match.
+                    job_no_match = False
+                    # check to see if any jobs left
+                    # also check to see if this is last emp if it is we dont want to pop a
+                    # new job, end the loop and then pop a new one under the while loop.
+                    # we would lose the job popped in the middle
+                    if heap.heap and i < len(Employee.today_emps):
+                        # if so pop a new job and go back up to get a new emp
+                        next_job = heap.pop_max()
+                        continue
+                    # if the heap is done
+                    else:
+                        break
 
-            heap.no_match_jobs.append(next_job)
+            # if after checking all emps a job is not compatible add it to a nomatch list
+            if job_no_match:
+                heap.no_match_jobs.append(next_job)
+
+            # go through emps if any are free reset allbooked to false
+            # and break out of the check(only need one)
+            for emp in Employee.today_emps:
+                if not emp.booked:
+                    all_booked = False
+                    break
+            # if the check above doesnt find any free emps all booked will remain true from above
+            # and the next while loop will not initiate
+
+    # at the end of a heap all no match jobs are put back in
+    for heap in MaxHeap.heaps_list:
         for job in heap.no_match_jobs:
             heap.insert(job)
 
