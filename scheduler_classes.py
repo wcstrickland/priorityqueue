@@ -151,6 +151,8 @@ def qs_helper(array, s_idx, e_idx):
         qs_helper(array, s_idx, r - 1)
 
 
+# todo create a get_job function
+# todo create a print_emp_schedule function
 def get_emp_no(employee_number):
     for emp in Employee.all_emps:
         if emp.number == employee_number:
@@ -206,7 +208,10 @@ def reset_day():
         heap.no_match_jobs = []
 
 
-# todo test this steaming pile of bugs waiting to happen
+# todo generate 'static' jobs, emps, and heaps to create a test for this\
+# todo create a case where emps never reach max to ensure jobs are left behind as needed
+# todo create a case where all emps are booked quickly and func terminates
+# todo add param of priority lvl that if jobs are left an alert is given
 def schedule(off_employees: list):
     """
     assign emps high priority jobs evenly until schedules are full or no jobs remain
