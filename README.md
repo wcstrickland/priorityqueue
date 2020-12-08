@@ -14,4 +14,4 @@ The program allows the creation of Employees, Jobs, and Priority levels. Jobs ha
 - Use of modulo in a  generator in conjunction with a range-based for loop to “wrap” around to the beginning of a list and “remember” the last item the next time the for loop is accessed in code.
 
 ### Sample alert and individual schedule 
-![alt text](images/sample alert.png)
+![alt text](sample alert.png)
