@@ -12,3 +12,6 @@ The program allows the creation of Employees, Jobs, and Priority levels. Jobs ha
 - Use of max heap to create priority queues based on the attribute of an object to optimize performance
 - Use of a non-built-in sorting algorithm to sort a list of objects based on a property
 - Use of modulo in a  generator in conjunction with a range-based for loop to “wrap” around to the beginning of a list and “remember” the last item the next time the for loop is accessed in code.
+
+### Sample alert and individual schedule 
+![alt text](images/sample alert.png)
