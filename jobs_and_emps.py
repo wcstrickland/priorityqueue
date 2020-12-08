@@ -1,4 +1,5 @@
-from scheduler_classes import Job, Employee, MaxHeap, schedule, get_emp_no
+from scheduler_classes import Job, Employee, MaxHeap, get_emp_no, schedule
+
 import random
 
 # list of first names for generating random employees
@@ -45,33 +46,40 @@ if __name__ == '__main__':
     for emp in Employee.all_emps:
         print(emp)
 
-    schedule([])
+    emp_1 = get_emp_no(1)
+    print()
 
-    for heap in MaxHeap.heaps_list:
-        print("*" * 90)
-        print(heap, "\t", "jobs in heap:", len(heap.heap))
-        print("*" * 90)
-        print(heap.heap)
-        print("*" * 90)
-
+    schedule([], 2)
+    print()
+    emp_1.print_schedule()
+    #
+    # # prints heaps after scheduling
+    # for heap in MaxHeap.heaps_list:
+    #     print("*" * 90)
+    #     print(heap, "\t", "jobs in heap:", len(heap.heap))
+    #     print("*" * 90)
+    #     print(heap.heap)
+    #     print("*" * 90)
+    #
+    # prints emps after scheduling
     for emp in Employee.all_emps:
         print(emp)
-
-    emp_0 = get_emp_no(0)
-    print(emp_0.today_jobs)
-
-    schedule([])
-
-    for heap in MaxHeap.heaps_list:
-        print("*" * 90)
-        print(heap, "\t", "jobs in heap:", len(heap.heap))
-        print("*" * 90)
-        print(heap.heap)
-        print("*" * 90)
-
-    for emp in Employee.all_emps:
-        print(emp)
-
-    emp_0 = get_emp_no(0)
-    print(emp_0.today_jobs)
-
+    #
+    # emp_0 = get_emp_no(0)
+    # print(emp_0.today_jobs)
+    #
+    # # second scheduling run
+    # schedule([])
+    #
+    # for heap in MaxHeap.heaps_list:
+    #     print("*" * 90)
+    #     print(heap, "\t", "jobs in heap:", len(heap.heap))
+    #     print("*" * 90)
+    #     print(heap.heap)
+    #     print("*" * 90)
+    #
+    # for emp in Employee.all_emps:
+    #     print(emp)
+    #
+    # emp_0 = get_emp_no(0)
+    # print(emp_0.today_jobs)

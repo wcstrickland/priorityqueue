@@ -1,6 +1,3 @@
-# Todo test:  test schedule is generated and never infinite loops
-
-
 class Employee:
     emp_number = 0
     all_emps = []
@@ -20,6 +17,13 @@ class Employee:
 
     def __repr__(self):
         return f"{self.number}: {self.fname}{self.lname} scheduled:{self.today_hours}, max:{self.max_hours}"
+
+    def print_schedule(self):
+        print((self.fname + " " + self.lname).upper())
+        for number, job in enumerate(self.today_jobs):
+            print("-" * 68)
+            print("|", number + 1, "|", job, "|")
+            print("-" * 68)
 
 
 class Job:
@@ -43,7 +47,7 @@ class Job:
         Job.jobs_number += 1
 
     def __repr__(self):
-        return f"JOB#:{self.job_number}, unit:{self.unit}, time_existed:{self.time_existed},\\" \
+        return f"JOB#:{self.job_number}, unit:{self.unit}, time_existed:{self.time_existed}," \
                f" time_needed: {self.time_needed}, plevel:{self.priority}"
 
 
@@ -151,8 +155,13 @@ def qs_helper(array, s_idx, e_idx):
         qs_helper(array, s_idx, r - 1)
 
 
-# todo create a get_job function
-# todo create a print_emp_schedule function
+def get_job_no(job_id_number):
+    for heap in MaxHeap.heaps_list:
+        for job in heap.heap:
+            if job.job_number == job_id_number:
+                return job
+
+
 def get_emp_no(employee_number):
     for emp in Employee.all_emps:
         if emp.number == employee_number:
@@ -211,10 +220,14 @@ def reset_day():
 # todo generate 'static' jobs, emps, and heaps to create a test for this\
 # todo create a case where emps never reach max to ensure jobs are left behind as needed
 # todo create a case where all emps are booked quickly and func terminates
-# todo add param of priority lvl that if jobs are left an alert is given
-def schedule(off_employees: list):
+
+def schedule(off_employees: list, threshhold: int):
     """
     assign emps high priority jobs evenly until schedules are full or no jobs remain
+    prints an alert if any jobs within threshold priority level are not assigned
+    :param off_employees: list of employees who are not to be scheduled
+    :param threshhold: priority level threshold. if all in range not assigned creates an alert
+    :return:
     """
     # reset the day
     reset_day()
@@ -300,6 +313,13 @@ def schedule(off_employees: list):
     for heap in MaxHeap.heaps_list:
         for job in heap.no_match_jobs:
             heap.insert(job)
+
+    # checks heaps in list through thresh hold and prints an alert about status of jobs left in heap
+    for i in range(threshhold):
+        if MaxHeap.heaps_list[i].heap:
+            print(f"{len(MaxHeap.heaps_list[i].heap)} jobs left in priority level {MaxHeap.heaps_list[i].priority_level}:", MaxHeap.heaps_list[i].heap)
+        else:
+            print(f"All jobs in Priority level {i + 1} assigned")
 
 
 if __name__ == '__main__':

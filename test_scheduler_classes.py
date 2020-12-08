@@ -2,7 +2,6 @@ import unittest
 from scheduler_classes import Employee, Job, MaxHeap, schedule, remove_emp_no, remove_job_no
 
 
-
 # todo create test for get_emp_no, reset_day, get_gen,
 class TestScheduler(unittest.TestCase):
 
