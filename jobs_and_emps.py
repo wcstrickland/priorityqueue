@@ -15,11 +15,13 @@ alphabet = list("abcdefghijklmnopqrstuvwxyz")
 
 # initial construction of priority queues
 
+p4 = MaxHeap(4)
+p5 = MaxHeap(5)
 p1 = MaxHeap(1)
 p2 = MaxHeap(2)
 p3 = MaxHeap(3)
-p4 = MaxHeap(4)
-p5 = MaxHeap(5)
+
+
 
 # generate 100 random jobs
 for i in range(100):

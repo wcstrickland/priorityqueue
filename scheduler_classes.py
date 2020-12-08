@@ -62,7 +62,7 @@ class MaxHeap:
         self.no_match_jobs = []
         self.priority_level = priority_level
         self.heaps_list.append(self)
-        quick_sort(self.heaps_list)
+        self.heaps_list.sort(key=lambda x: x.priority_level)
 
     def __str__(self):
         return f"plevel: {self.priority_level}"
@@ -115,47 +115,12 @@ class MaxHeap:
         heap[i], heap[j] = heap[j], heap[i]
 
 
-def quick_sort(array):
-    """
-    quick sort modified to sort an array of heaps based on p_level property
-    :param array:
-    :return:
-    """
-    qs_helper(array, 0, len(array) - 1)
-    return array
-
-
-def qs_helper(array, s_idx, e_idx):
-    """
-    quick sort recursive function
-    :param array:
-    :param s_idx:
-    :param e_idx:
-    :return:
-    """
-    if s_idx >= e_idx:
-        return
-    p_idx = s_idx
-    l = s_idx + 1
-    r = e_idx
-    while r >= l:
-        if array[l].priority_level > array[p_idx].priority_level > array[r].priority_level:
-            array[l], array[r] = array[r], array[l]
-        if array[l].priority_level <= array[p_idx].priority_level:
-            l += 1
-        if array[r].priority_level >= array[p_idx].priority_level:
-            r -= 1
-    array[p_idx], array[r] = array[r], array[p_idx]
-    left_smaller = r - 1 - s_idx < e_idx - (r + 1)
-    if left_smaller:
-        qs_helper(array, s_idx, r - 1)
-        qs_helper(array, r + 1, e_idx)
-    else:
-        qs_helper(array, r + 1, e_idx)
-        qs_helper(array, s_idx, r - 1)
-
-
 def get_job_no(job_id_number):
+    """
+    gets a job via job number
+    :param job_id_number:
+    :return:
+    """
     for heap in MaxHeap.heaps_list:
         for job in heap.heap:
             if job.job_number == job_id_number:
@@ -163,6 +128,11 @@ def get_job_no(job_id_number):
 
 
 def get_emp_no(employee_number):
+    """
+    gets an employee via emp number
+    :param employee_number:
+    :return:
+    """
     for emp in Employee.all_emps:
         if emp.number == employee_number:
             return emp
