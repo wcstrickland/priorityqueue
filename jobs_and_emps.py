@@ -51,18 +51,19 @@ if __name__ == '__main__':
     emp_1 = get_emp_no(1)
     print()
 
+
     schedule([], 2)
     print()
     emp_1.print_schedule()
-    #
-    # # prints heaps after scheduling
-    # for heap in MaxHeap.heaps_list:
-    #     print("*" * 90)
-    #     print(heap, "\t", "jobs in heap:", len(heap.heap))
-    #     print("*" * 90)
-    #     print(heap.heap)
-    #     print("*" * 90)
-    #
+
+    # prints heaps after scheduling
+    for heap in MaxHeap.heaps_list:
+        print("*" * 90)
+        print(heap, "\t", "jobs in heap:", len(heap.heap))
+        print("*" * 90)
+        print(heap.heap)
+        print("*" * 90)
+
     # prints emps after scheduling
     for emp in Employee.all_emps:
         print(emp)
@@ -83,5 +84,4 @@ if __name__ == '__main__':
     # for emp in Employee.all_emps:
     #     print(emp)
     #
-    # emp_0 = get_emp_no(0)
-    # print(emp_0.today_jobs)
+

@@ -43,6 +43,12 @@ class Job:
                 heap.insert(self)
         if not self.has_priority_level:
             raise ValueError("priority level does not exist")
+        not_null = [time_needed, time_existed, priority]
+        for must_have in not_null:
+            if isinstance(must_have, str):
+                raise TypeError("time needed and time existed must be numeric values")
+            if must_have is None or must_have < 0:
+                raise ValueError("time needed and time existed must be positive values")
 
         Job.jobs_number += 1
 
@@ -54,7 +60,11 @@ class Job:
 class MaxHeap:
     heaps_list = []
 
-    def __init__(self, priority_level):
+    def __init__(self, priority_level: int):
+        if isinstance(priority_level, str):
+            raise TypeError("priority level must be numeric value")
+        if priority_level < 0 or priority_level is None:
+            raise ValueError("Priority level must be a positive value")
         for heap in self.heaps_list:
             if priority_level == heap.priority_level:
                 raise ValueError(": Priority Level already exists")
@@ -191,12 +201,12 @@ def reset_day():
 # todo create a case where emps never reach max to ensure jobs are left behind as needed
 # todo create a case where all emps are booked quickly and func terminates
 
-def schedule(off_employees: list, threshhold: int):
+def schedule(off_employees: list, threshold: int):
     """
     assign emps high priority jobs evenly until schedules are full or no jobs remain
     prints an alert if any jobs within threshold priority level are not assigned
     :param off_employees: list of employees who are not to be scheduled
-    :param threshhold: priority level threshold. if all in range not assigned creates an alert
+    :param threshold: priority level threshold. if all in range not assigned creates an alert
     :return:
     """
     # reset the day
@@ -285,7 +295,7 @@ def schedule(off_employees: list, threshhold: int):
             heap.insert(job)
 
     # checks heaps in list through thresh hold and prints an alert about status of jobs left in heap
-    for i in range(threshhold):
+    for i in range(threshold):
         if MaxHeap.heaps_list[i].heap:
             print(f"{len(MaxHeap.heaps_list[i].heap)} jobs left in priority level {MaxHeap.heaps_list[i].priority_level}:", MaxHeap.heaps_list[i].heap)
         else:

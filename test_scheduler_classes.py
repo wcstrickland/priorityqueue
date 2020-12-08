@@ -1,8 +1,8 @@
 import unittest
-from scheduler_classes import Employee, Job, MaxHeap, schedule, remove_emp_no, remove_job_no
+from scheduler_classes import Employee, Job, MaxHeap, schedule, remove_emp_no, remove_job_no, get_emp_no, get_job_no, \
+    reset_day, emp_gen
 
 
-# todo create test for get_emp_no, reset_day, get_gen,
 class TestScheduler(unittest.TestCase):
 
     def setUp(self):
@@ -58,6 +58,8 @@ class TestScheduler(unittest.TestCase):
         # tests if attempt to create existing priority level raises err
         with self.assertRaises(ValueError):
             _ = MaxHeap(1)
+            _ = MaxHeap(-1)
+            _ = MaxHeap("x")
 
     def test_Job(self):
         """
@@ -71,6 +73,10 @@ class TestScheduler(unittest.TestCase):
         with self.assertRaises(ValueError):
             # job_with_priority_not_existing
             _ = Job("c2", 5, 5, 7)
+            # jobs with invalid inputs
+            _ = Job("x", -1, 4, 7)
+            _ = Job("x", 1, None, 7)
+            _ = Job("x", 1, 3, "x")
 
     def test_remove_emp_no(self):
         """
@@ -97,6 +103,32 @@ class TestScheduler(unittest.TestCase):
 
     def test_schedule(self):
         pass
+
+    def test_get_emp_no(self):
+        x = get_emp_no(1)
+        self.assertEqual(x, self.emp_2)
+
+    def test_reset_day(self):
+        Employee.today_emps.append(self.emp_1)
+        Employee.today_emps.append(self.emp_2)
+        self.assertEqual(Employee.today_emps, [self.emp_1, self.emp_2])
+        self.emp_1.today_hours = 6
+        self.emp_2.today_jobs = ["x"]
+        self.h_1.no_match_jobs.append(self.j_1_1)
+        reset_day()
+        self.assertEqual(self.emp_1.today_hours, 0)
+        self.assertEqual(self.emp_2.today_jobs, [])
+        self.assertEqual(Employee.today_emps, [])
+        self.assertEqual(self.h_1.no_match_jobs, [])
+
+    def test_get_gen(self):
+        tst_list = [True for x in range(20)]
+        tst_gen = emp_gen(tst_list)
+        self.assertEqual(next(tst_gen), 0)
+        self.assertEqual(next(tst_gen), 1)
+        for _ in range(len(tst_list)):
+            next(tst_gen)
+        self.assertEqual(next(tst_gen), 2)
 
 
 if __name__ == '__main__':
